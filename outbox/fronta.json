@@ -1,1 +1,10 @@
-[]
+[
+ {
+  "id": "zprava-bara-tomasova-2026-07-27-123453",
+  "jmeno": "Bára Tomášová",
+  "tel": "+420731862055",
+  "text": "tets rekni mi jestli ti to doslo",
+  "typ": "zprava",
+  "kdy": "2026-07-27T09:00"
+ }
+]
