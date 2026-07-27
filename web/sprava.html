@@ -1,0 +1,606 @@
+<title>Přání</title>
+<style>
+  :root{
+    color-scheme: light;
+    --pozadi:#F5F5F7; --karta:#FFFFFF; --inkoust:#1D1D1F; --sedivy:#6E6E73;
+    --linka:#E8E8ED; --vstup:#F2F2F6;
+    --akcent:#B03A48; --akcent-pozadi:#F9EDEE;
+    --ok:#2E7D4F; --ok-pozadi:#EAF4EE;
+    --pozor:#8F6412; --pozor-pozadi:#FBF3DF;
+    --chyba:#B3372F; --chyba-pozadi:#FBEDEC;
+  }
+  /* Zamerne jedno tema: svetly design podle zadani, ve tme se nic neprevraci */
+  :root[data-theme="dark"], :root[data-theme="light"]{ color-scheme: light; }
+  *{ box-sizing:border-box; margin:0; }
+  html,body{ background:var(--pozadi); }
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+    color:var(--inkoust); font-size:16px; line-height:1.45;
+    -webkit-font-smoothing:antialiased; padding-bottom:calc(96px + env(safe-area-inset-bottom));
+  }
+  .obal{ max-width:640px; margin:0 auto; padding:0 16px; }
+
+  header.top{
+    position:sticky; top:0; z-index:20; background:rgba(245,245,247,.88);
+    -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--linka); padding-top:env(safe-area-inset-top);
+  }
+  .top-rada{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 0 8px; }
+  h1{ font-size:28px; font-weight:800; letter-spacing:-.02em; }
+  .stav-radek{ font-size:13px; color:var(--sedivy); min-height:18px; padding-bottom:8px; display:flex; align-items:center; gap:6px; }
+  .stav-tecka{ width:7px; height:7px; border-radius:50%; background:var(--ok); flex:none; }
+  .stav-tecka.pozor{ background:var(--pozor); } .stav-tecka.chyba{ background:var(--chyba); }
+  button.ikona{
+    border:0; background:var(--karta); color:var(--akcent); width:36px; height:36px;
+    border-radius:50%; font-size:17px; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,.06);
+    display:flex; align-items:center; justify-content:center;
+  }
+  button.ikona:active{ transform:scale(.94); }
+
+  nav.taby{ display:flex; gap:4px; background:#E9E9EE; border-radius:12px; padding:3px; margin:12px 0 4px; }
+  nav.taby button{
+    flex:1; border:0; background:transparent; font:inherit; font-size:14px; font-weight:600;
+    color:var(--sedivy); padding:8px 2px; border-radius:9px; cursor:pointer; position:relative;
+  }
+  nav.taby button.aktivni{ background:var(--karta); color:var(--inkoust); box-shadow:0 1px 3px rgba(0,0,0,.10); }
+  .badge{
+    position:absolute; top:2px; right:6px; background:var(--akcent); color:#fff;
+    font-size:10px; font-weight:700; border-radius:9px; min-width:17px; height:17px;
+    display:flex; align-items:center; justify-content:center; padding:0 4px;
+  }
+
+  main{ padding-top:14px; }
+  .den-hlava{
+    font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.07em;
+    color:var(--sedivy); margin:22px 2px 8px;
+  }
+  .den-hlava:first-child{ margin-top:4px; }
+  .den-hlava .dnes{ color:var(--akcent); }
+
+  .karta{
+    background:var(--karta); border-radius:14px; padding:14px; margin-bottom:10px;
+    box-shadow:0 1px 2px rgba(0,0,0,.05);
+  }
+  .karta.vynechana{ opacity:.55; }
+  .k-hlava{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .k-jmeno{ font-size:17px; font-weight:700; letter-spacing:-.01em; }
+  .k-kdo{ font-size:13px; color:var(--sedivy); margin-top:1px; }
+  .chipy{ display:flex; gap:5px; flex-wrap:wrap; justify-content:flex-end; flex:none; }
+  .chip{
+    font-size:11px; font-weight:700; padding:3px 8px; border-radius:20px; white-space:nowrap;
+    background:var(--vstup); color:var(--sedivy);
+  }
+  .chip.narozeniny{ background:var(--akcent-pozadi); color:var(--akcent); }
+  .chip.svatek{ background:#EDF2FB; color:#3A5FA8; }
+  .chip.zprava{ background:#F0EBF8; color:#6A4CA0; }
+  .chip.pozor{ background:var(--pozor-pozadi); color:var(--pozor); }
+  .chip.ok{ background:var(--ok-pozadi); color:var(--ok); }
+  .chip.chyba{ background:var(--chyba-pozadi); color:var(--chyba); }
+
+  textarea, input[type=text], input[type=tel], input[type=date], input[type=time], input[type=search]{
+    width:100%; border:0; background:var(--vstup); border-radius:10px; padding:10px 12px;
+    font:inherit; font-size:15px; color:var(--inkoust); outline:none;
+  }
+  textarea:focus, input:focus{ box-shadow:0 0 0 2px var(--akcent) inset; }
+  textarea{ resize:none; min-height:44px; overflow:hidden; }
+  textarea::placeholder, input::placeholder{ color:#A6A6AD; }
+  .k-telo{ margin-top:10px; display:flex; flex-direction:column; gap:8px; }
+  .radek{ display:flex; gap:8px; align-items:center; }
+  .radek label{ font-size:13px; color:var(--sedivy); flex:none; width:82px; }
+  input[type=time], input[type=date]{ width:auto; font-variant-numeric:tabular-nums; }
+  .k-akce{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .k-akce a, .k-akce button{
+    border:0; font:inherit; font-size:13px; font-weight:600; padding:7px 12px; border-radius:9px;
+    cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:5px;
+  }
+  .tl-jemne{ background:var(--vstup); color:var(--inkoust); }
+  .tl-akcent{ background:var(--akcent); color:#fff; }
+  .tl-ok{ background:var(--ok-pozadi); color:var(--ok); }
+
+  .prazdno{ text-align:center; color:var(--sedivy); padding:44px 20px; font-size:15px; }
+  .prazdno .velke{ font-size:40px; margin-bottom:10px; }
+
+  .hledani{ position:relative; margin-bottom:12px; }
+  .filtr-chipy{ display:flex; gap:6px; overflow-x:auto; padding-bottom:10px; -webkit-overflow-scrolling:touch; }
+  .filtr-chipy button{
+    border:0; font:inherit; font-size:13px; font-weight:600; padding:6px 12px; border-radius:20px;
+    background:var(--karta); color:var(--sedivy); cursor:pointer; white-space:nowrap; box-shadow:0 1px 2px rgba(0,0,0,.05);
+  }
+  .filtr-chipy button.aktivni{ background:var(--inkoust); color:#fff; }
+
+  .osoba-rada{
+    background:var(--karta); padding:12px 14px; display:flex; align-items:center; gap:10px; cursor:pointer;
+  }
+  .osoba-seznam{ border-radius:14px; overflow:hidden; box-shadow:0 1px 2px rgba(0,0,0,.05); }
+  .osoba-seznam .osoba-rada + .osoba-rada{ border-top:1px solid var(--linka); }
+  .osoba-info{ flex:1; min-width:0; }
+  .osoba-jmeno{ font-size:15px; font-weight:600; }
+  .osoba-meta{ font-size:12px; color:var(--sedivy); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .osoba-datumy{ font-size:12px; color:var(--sedivy); text-align:right; flex:none; font-variant-numeric:tabular-nums; }
+  .osoba-detail{ background:var(--karta); border-top:1px solid var(--linka); padding:12px 14px 14px; display:flex; flex-direction:column; gap:8px; }
+  .prepinac{ display:flex; align-items:center; justify-content:space-between; font-size:14px; }
+  .prepinac input{ width:20px; height:20px; accent-color:var(--akcent); }
+
+  .banner{
+    border-radius:14px; padding:13px 14px; margin-bottom:12px; font-size:14px;
+    background:var(--pozor-pozadi); color:var(--pozor);
+  }
+  .banner.chyba{ background:var(--chyba-pozadi); color:var(--chyba); }
+  .banner b{ display:block; margin-bottom:3px; }
+  .banner .k-akce{ margin-top:9px; }
+
+  .ulozit-listu{
+    position:fixed; left:0; right:0; bottom:0; z-index:30;
+    background:rgba(255,255,255,.92); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+    border-top:1px solid var(--linka); padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+    transform:translateY(110%); transition:transform .22s ease;
+  }
+  .ulozit-listu.videt{ transform:translateY(0); }
+  .ulozit-vnitrek{ max-width:640px; margin:0 auto; display:flex; align-items:center; gap:12px; }
+  .ulozit-vnitrek span{ flex:1; font-size:14px; color:var(--sedivy); }
+  .ulozit-vnitrek button{
+    border:0; font:inherit; font-size:15px; font-weight:700; background:var(--akcent); color:#fff;
+    padding:11px 22px; border-radius:12px; cursor:pointer;
+  }
+  .ulozit-vnitrek button:disabled{ opacity:.6; }
+
+  .toast{
+    position:fixed; left:50%; bottom:calc(84px + env(safe-area-inset-bottom)); transform:translateX(-50%) translateY(8px);
+    background:var(--inkoust); color:#fff; font-size:14px; font-weight:600; padding:10px 18px;
+    border-radius:22px; opacity:0; transition:.25s; z-index:40; pointer-events:none; white-space:nowrap;
+  }
+  .toast.videt{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  .nova-form{ display:flex; flex-direction:column; gap:10px; }
+  .vybrany{ display:flex; align-items:center; gap:10px; background:var(--akcent-pozadi); border-radius:12px; padding:10px 12px; }
+  .vybrany b{ flex:1; }
+  .vybrany button{ border:0; background:transparent; color:var(--akcent); font-size:18px; cursor:pointer; }
+  .datum-chipy{ display:flex; gap:6px; flex-wrap:wrap; }
+  .datum-chipy button{
+    border:0; font:inherit; font-size:13px; font-weight:600; padding:7px 12px; border-radius:9px;
+    background:var(--vstup); color:var(--inkoust); cursor:pointer;
+  }
+  .datum-chipy button.aktivni{ background:var(--inkoust); color:#fff; }
+
+  .paticka{ text-align:center; font-size:12px; color:#A6A6AD; padding:30px 0 10px; }
+  @media(min-width:700px){ body{ font-size:16px; } .obal{ padding:0 24px; } }
+  @media(prefers-reduced-motion:reduce){ *{ transition:none !important; } }
+</style>
+
+<header class="top"><div class="obal">
+  <div class="top-rada">
+    <h1>Přání</h1>
+    <button class="ikona" id="tlObnovit" title="Načíst znovu" aria-label="Načíst znovu">&#8635;</button>
+  </div>
+  <div class="stav-radek" id="stavRadek"></div>
+  <nav class="taby" id="taby">
+    <button data-tab="fronta" class="aktivni">Fronta<span class="badge" id="badgeFronta" hidden></span></button>
+    <button data-tab="nova">Nová</button>
+    <button data-tab="lidi">Lidi</button>
+    <button data-tab="poslane">Poslané</button>
+  </nav>
+</div></header>
+
+<main class="obal">
+  <section id="sekce-fronta"></section>
+  <section id="sekce-nova" hidden></section>
+  <section id="sekce-lidi" hidden></section>
+  <section id="sekce-poslane" hidden></section>
+  <div class="paticka">Přání &middot; Jonatan Petr</div>
+</main>
+
+<div class="ulozit-listu" id="ulozitListu"><div class="ulozit-vnitrek">
+  <span id="ulozitText">Neuložené změny</span>
+  <button id="tlUlozit">Uložit</button>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){"use strict";
+var SERVER="Google Drive";
+var SLOZKA="1K5T38peUqGtDsFhsC8bR5ycdD3TQvlCE";
+var NAZEV="prani-data.json";
+var HORIZONT=30;
+var DNY=["Ne","Po","Út","St","Čt","Pá","So"];
+var MESICE=["ledna","února","března","dubna","května","června","července","srpna","září","října","listopadu","prosince"];
+var SEED={"verze": 1, "aktualizovano": "2026-07-27T18:17:37Z", "nastaveni": {"vychoziCas": "09:00"}, "dotazy": [{"id": "dotaz-hrabak", "text": "Matyáš Hrabák: platí narozeniny 27. 4., nebo 27. 5.? Byl v seznamu dvakrát, teď je vedený jednou.", "osobaId": "matyas-hrabak", "volby": ["4-27", "5-27"], "vyreseno": false}], "lide": [{"id": "adam-dalecky", "jmeno": "Adam Dalecký", "kdo": "nejlepší kamarád, spoluprojekty", "svet": "Blízcí přátelé", "blizkost": "Jádro", "tel": "", "email": "", "narozeniny": "1-1", "rokNarozeni": "", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "benjamin-petr", "jmeno": "Benjamin Petr", "kdo": "bratr", "svet": "Rodina", "blizkost": "Jádro", "tel": "+420737246880", "email": "benjaminbpetr@gmail.com", "narozeniny": "5-16", "rokNarozeni": "", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "bara-tomasova", "jmeno": "Bára Tomášová", "kdo": "partnerka", "svet": "Bára a její lidi", "blizkost": "Jádro", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "12-4", "pratNarozeniny": false, "pratSvatek": true, "cas": ""}, {"id": "nela-petrova", "jmeno": "Nela Petrová", "kdo": "sestra", "svet": "Rodina", "blizkost": "Jádro", "tel": "+420739671801", "email": "nelca.petrova@gmail.com", "narozeniny": "9-26", "rokNarozeni": "", "svatek": "2-2", "pratNarozeniny": true, "pratSvatek": true, "cas": ""}, {"id": "anastazie-zvonikova", "jmeno": "Anastázie Zvoníková", "kdo": "kamarádka, spoluprojekty", "svet": "Blízcí přátelé", "blizkost": "Jádro", "tel": "+420734647086", "email": "anastazie.zv@gmail.com", "narozeniny": "10-9", "rokNarozeni": "2004", "svatek": "4-15", "pratNarozeniny": true, "pratSvatek": true, "cas": ""}, {"id": "helena-petrova", "jmeno": "Helena Petrová", "kdo": "máma", "svet": "Rodina", "blizkost": "Jádro", "tel": "+420603434474", "email": "hepetrova@gmail.com", "narozeniny": "12-27", "rokNarozeni": "", "svatek": "8-18", "pratNarozeniny": true, "pratSvatek": true, "cas": ""}, {"id": "jan-petr", "jmeno": "Jan Petr", "kdo": "táta", "svet": "Rodina", "blizkost": "Jádro", "tel": "", "email": "", "narozeniny": "7-19", "rokNarozeni": "", "svatek": "6-24", "pratNarozeniny": true, "pratSvatek": true, "cas": ""}, {"id": "jenda-petr", "jmeno": "Jenda Petr", "kdo": "děda", "svet": "Rodina", "blizkost": "Blízcí", "tel": "", "email": "", "narozeniny": "5-28", "rokNarozeni": "", "svatek": "6-24", "pratNarozeniny": true, "pratSvatek": true, "cas": ""}, {"id": "frantisek-marghold", "jmeno": "František Marghold", "kdo": "", "svet": "Blízcí přátelé", "blizkost": "Blízcí", "tel": "", "email": "", "narozeniny": "1-8", "rokNarozeni": "", "svatek": "10-4", "pratNarozeniny": true, "pratSvatek": true, "cas": ""}, {"id": "matej-simonovsky", "jmeno": "Matěj Šimonovský", "kdo": "", "svet": "Blízcí přátelé", "blizkost": "Blízcí", "tel": "", "email": "", "narozeniny": "10-22", "rokNarozeni": "", "svatek": "2-24", "pratNarozeniny": true, "pratSvatek": true, "cas": ""}, {"id": "dana-mataskova", "jmeno": "Dana Maťašková", "kdo": "teta, hlídala nás", "svet": "Rodina", "blizkost": "Blízcí", "tel": "+420739019724", "email": "", "narozeniny": "8-29", "rokNarozeni": "", "svatek": "12-11", "pratNarozeniny": true, "pratSvatek": true, "cas": ""}, {"id": "david-havlik", "jmeno": "David Havlík", "kdo": "muž sestřenice", "svet": "Širší rodina", "blizkost": "Blízcí", "tel": "", "email": "", "narozeniny": "4-4", "rokNarozeni": "", "svatek": "12-30", "pratNarozeniny": true, "pratSvatek": true, "cas": ""}, {"id": "evelina-chromovska", "jmeno": "Evelína Chromovská", "kdo": "sestřenice", "svet": "Širší rodina", "blizkost": "Blízcí", "tel": "+420737246882", "email": "", "narozeniny": "4-16", "rokNarozeni": "", "svatek": "8-29", "pratNarozeniny": true, "pratSvatek": true, "cas": ""}, {"id": "josefina-chromovska", "jmeno": "Josefina Chromovská", "kdo": "sestřenice", "svet": "Širší rodina", "blizkost": "Blízcí", "tel": "+420777502102", "email": "", "narozeniny": "6-21", "rokNarozeni": "", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "lucie-kludajova", "jmeno": "Lucie Kludajová", "kdo": "teta", "svet": "Širší rodina", "blizkost": "Blízcí", "tel": "+420728837868", "email": "", "narozeniny": "4-30", "rokNarozeni": "", "svatek": "12-13", "pratNarozeniny": true, "pratSvatek": true, "cas": ""}, {"id": "lucie-marie-mrazova", "jmeno": "Lucie Marie Mrazová", "kdo": "", "svet": "Kamarádi", "blizkost": "Blízcí", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "12-13", "pratNarozeniny": false, "pratSvatek": true, "cas": ""}, {"id": "vladimir-kludaj", "jmeno": "Vladimír Kludaj", "kdo": "strýc", "svet": "Širší rodina", "blizkost": "Blízcí", "tel": "", "email": "", "narozeniny": "8-3", "rokNarozeni": "", "svatek": "5-23", "pratNarozeniny": true, "pratSvatek": true, "cas": ""}, {"id": "blanka-dvorakova", "jmeno": "Blanka Dvořáková", "kdo": "babička", "svet": "Rodina", "blizkost": "Blízcí", "tel": "+420732224222", "email": "blanck@seznam.cz", "narozeniny": "5-7", "rokNarozeni": "", "svatek": "12-2", "pratNarozeniny": true, "pratSvatek": true, "cas": ""}, {"id": "majda-havlikova", "jmeno": "Majda Havlíková", "kdo": "sestřenice", "svet": "Širší rodina", "blizkost": "Blízcí", "tel": "", "email": "", "narozeniny": "7-13", "rokNarozeni": "", "svatek": "7-22", "pratNarozeniny": true, "pratSvatek": true, "cas": ""}, {"id": "marek-smidl", "jmeno": "Marek Šmídl", "kdo": "muž sestřenice", "svet": "Širší rodina", "blizkost": "Blízcí", "tel": "", "email": "", "narozeniny": "8-3", "rokNarozeni": "", "svatek": "4-25", "pratNarozeniny": true, "pratSvatek": true, "cas": ""}, {"id": "milan-dvorak", "jmeno": "Milan Dvořák", "kdo": "děda", "svet": "Rodina", "blizkost": "Blízcí", "tel": "+420602222116", "email": "", "narozeniny": "5-10", "rokNarozeni": "", "svatek": "6-18", "pratNarozeniny": true, "pratSvatek": true, "cas": ""}, {"id": "petr-winkler", "jmeno": "Petr Winkler", "kdo": "švagr", "svet": "Rodina", "blizkost": "Blízcí", "tel": "", "email": "", "narozeniny": "4-6", "rokNarozeni": "", "svatek": "2-22", "pratNarozeniny": true, "pratSvatek": true, "cas": ""}, {"id": "veronika-smidlova", "jmeno": "Veronika Šmídlová", "kdo": "sestřenice", "svet": "Širší rodina", "blizkost": "Blízcí", "tel": "", "email": "", "narozeniny": "3-30", "rokNarozeni": "", "svatek": "2-7", "pratNarozeniny": true, "pratSvatek": true, "cas": ""}, {"id": "william-winkler", "jmeno": "William Winkler", "kdo": "synovec", "svet": "Rodina", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "6-3", "rokNarozeni": "", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "filip-mihely", "jmeno": "Filip Mihely", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "5-26", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "kaja-tumova", "jmeno": "Kája Tumová", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "7-14", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "leaticie", "jmeno": "Leaticie", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "marie-april-divis", "jmeno": "Marie April Diviš", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "9-12", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "ondra", "jmeno": "Ondra", "kdo": "Bářin nejlepší kamarád", "svet": "Bára a její lidi", "blizkost": "Okruh", "tel": "+420731321772", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "11-30", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "sara-tomasova", "jmeno": "Sára Tomášová", "kdo": "Bářina sestra", "svet": "Bára a její lidi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "10-9", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "simon-trepes", "jmeno": "Šimon Trepeš", "kdo": "střední", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "1-26", "rokNarozeni": "", "svatek": "12-22", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "adam-volke", "jmeno": "Adam Volke", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "adela-glejtekova", "jmeno": "Adéla Glejteková", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "6-14", "rokNarozeni": "", "svatek": "9-2", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "adela-mendikova", "jmeno": "Adéla Mendíková", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "9-2", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "amalie-katarina-slama", "jmeno": "Amálie Katarina Slama", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "ema-jokelova", "jmeno": "Ema Jokelová", "kdo": "střední", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420608974281", "email": "", "narozeniny": "8-28", "rokNarozeni": "", "svatek": "4-8", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "helena-kludajova", "jmeno": "Helena Kludajová", "kdo": "babička SK, nevlastní", "svet": "Širší rodina", "blizkost": "Okruh", "tel": "+421905224902", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "8-18", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "jaromir-blin", "jmeno": "Jaromír Blín", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "9-24", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "josef-strelecky", "jmeno": "Josef Střelecký", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "3-19", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "laco-kludaj", "jmeno": "Laco Kludaj", "kdo": "děda SK, nevlastní", "svet": "Širší rodina", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "6-27", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "lucie-hessingova", "jmeno": "Lucie Hessingová", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "12-13", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "lukas-kucera", "jmeno": "Lukáš Kučera", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "10-18", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "matyas-bily", "jmeno": "Matyáš Bílý", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "matyas-hrabak", "jmeno": "Matyáš Hrabák", "kdo": "", "svet": "Blízcí přátelé", "blizkost": "Blízcí", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "naty", "jmeno": "Naty", "kdo": "Bářina kamarádka", "svet": "Bára a její lidi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "12-21", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "nikolas-kaleidzidis", "jmeno": "Nikolas Kaleidzidis", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "tereza-chromovska", "jmeno": "Tereza Chromovská", "kdo": "teta", "svet": "Širší rodina", "blizkost": "Okruh", "tel": "+420737246888", "email": "", "narozeniny": "7-17", "rokNarozeni": "", "svatek": "10-15", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "vojtech-sobotka", "jmeno": "Vojtěch Sobotka", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "4-23", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "adam-vacek", "jmeno": "Adam Vacek", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "adelka-glejtekova", "jmeno": "Adelká Glejteková", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420778049204", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "amalie-amy", "jmeno": "Amalie Amy", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420776829986", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "anh-anna-pham", "jmeno": "Anh Anna Pham", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420771550585", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "anh-minh-pham", "jmeno": "Anh Minh Pham", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420776343198", "email": "pham.anickaa@gmail.com", "narozeniny": "12-21", "rokNarozeni": "2004", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "anicka-carbolova", "jmeno": "Anicka Carbolova", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420605972143", "email": "ana.carbolova@gmail.com", "narozeniny": "9-29", "rokNarozeni": "2005", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "annika-sumanova", "jmeno": "Annika Šumanová", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420736520211", "email": "annika.sumanova@gmail.com", "narozeniny": "10-31", "rokNarozeni": "2005", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "baru-tomasova", "jmeno": "Baru Tomášová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+420731862055", "email": "bara.tomasova06@gmail.com", "narozeniny": "5-24", "rokNarozeni": "2006", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "bellito", "jmeno": "Bellito", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420608026342", "email": "xsima046@studenti.czu.cz", "narozeniny": "5-9", "rokNarozeni": "2006", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "dan-lipovy", "jmeno": "Dan Lipový", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420776200251", "email": "dan.lipovy@me.com", "narozeniny": "11-3", "rokNarozeni": "2004", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "dan-vivid-books", "jmeno": "Dan vivid Books", "kdo": "", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+420739056178", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "david-bardos", "jmeno": "David Bardos", "kdo": "", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+420734393041", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "12-30", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "dominik-slavik", "jmeno": "Dominik Slavik", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420602750402", "email": "slavikdominik6@gmail.com", "narozeniny": "11-30", "rokNarozeni": "2005", "svatek": "8-4", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "frantisek-zjevik", "jmeno": "František Zjevík", "kdo": "", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+420603508207", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "10-4", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "helca", "jmeno": "Helča", "kdo": "Bářina kamarádka", "svet": "Bára a její lidi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "8-18", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "hrobon-pavel", "jmeno": "Hrobon Pavel", "kdo": "", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+420602354346", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "hrobonova-jitka", "jmeno": "Hrobonova Jitka", "kdo": "", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+420603520247", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "ivan-lubyako", "jmeno": "Ivan Lubyako", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "6-25", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "jakub-david", "jmeno": "Jakub David", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420737114462", "email": "jakub.david2@seznam.cz", "narozeniny": "6-7", "rokNarozeni": "2005", "svatek": "7-25", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "jana-hvozdova", "jmeno": "Jana Hvozdová", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420607513750", "email": "jhvozdova@seznam.cz", "narozeniny": "4-14", "rokNarozeni": "2005", "svatek": "5-24", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "josef-vodicka", "jmeno": "Josef Vodicka", "kdo": "", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+420604762925", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "3-19", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "julie-morgan", "jmeno": "Julie Morgan", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420606360914", "email": "", "narozeniny": "2-23", "rokNarozeni": "", "svatek": "12-10", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "justyna-drabkova", "jmeno": "Justýna Drábková", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "10-7", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "kaja-od-ady", "jmeno": "Kaja od Ady", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420777326678", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "7-14", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "karolina-tamarova", "jmeno": "Karolina Tamarová", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "7-14", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "lucie-m-mraz", "jmeno": "Lucie M. Mráz", "kdo": "", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+420731787878", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "12-13", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "lukas-moravec", "jmeno": "Lukáš Moravec", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "10-18", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "marek-cepela", "jmeno": "Marek Čepela", "kdo": "", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+420731431343", "email": "", "narozeniny": "2-24", "rokNarozeni": "", "svatek": "4-25", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "marketa-chudackova", "jmeno": "Marketa Chudackova", "kdo": "mámina kamarádka, právnička", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+420606678573", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "7-13", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "matej-novak", "jmeno": "Matej Novak", "kdo": "", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+420736242411", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "2-24", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "matyas-bruna", "jmeno": "Matyáš Brůna", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420604620011", "email": "matyasbruna05@gmail.com", "narozeniny": "1-29", "rokNarozeni": "2005", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "matyas-turinsky", "jmeno": "Matyáš Turinský", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "matej-cervinka", "jmeno": "Matěj Červinka", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420723969031", "email": "cervinka.matej@seznam.cz", "narozeniny": "1-29", "rokNarozeni": "2005", "svatek": "2-24", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "michael-brazina", "jmeno": "Michael Bražina", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420725948785", "email": "brazina.11@gmail.com", "narozeniny": "3-12", "rokNarozeni": "2004", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "milan-cap", "jmeno": "Milan Čáp", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420777253388", "email": "milancap88@gmail.com", "narozeniny": "8-8", "rokNarozeni": "2001", "svatek": "6-18", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "miroslav-scheiner", "jmeno": "Miroslav Scheiner", "kdo": "", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+420602262599", "email": "miroslav.scheiner@mpo.gov.cz", "narozeniny": "", "rokNarozeni": "", "svatek": "3-6", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "misa-curinova", "jmeno": "Misa Curinova", "kdo": "koučka, tiimi", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+420602287453", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "nikola-sulcova", "jmeno": "Nikola Šulcová", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "11-20", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "nikolas-kalaidzidis", "jmeno": "Nikolas Kalaidzidis", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420608888944", "email": "nikoscz1546@gmail.com", "narozeniny": "7-15", "rokNarozeni": "2002", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "novak-tomas", "jmeno": "Novak Tomas", "kdo": "", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+420603800969", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "pavel-kolacek", "jmeno": "Pavel Koláček", "kdo": "", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+420734417841", "email": "kolacek@rektorat.czu.cz", "narozeniny": "4-24", "rokNarozeni": "", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "petr-change-managemetn", "jmeno": "Petr (change Managemetn)", "kdo": "", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+421903272636", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "2-22", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "petr-oliver", "jmeno": "Petr Oliver", "kdo": "", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+420739960906", "email": "oliver@pef.czu.cz", "narozeniny": "", "rokNarozeni": "", "svatek": "2-22", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "petra-horakova", "jmeno": "Petra Horáková", "kdo": "od mámy", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+420603740112", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "8-17", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "sabina-cerstva", "jmeno": "Sabina Čerstvá", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "10-22", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "sophie-hessingova", "jmeno": "Sophie Hessingová", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "tereza-stoklasova", "jmeno": "Tereza Stoklasová", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "10-15", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "verca-pruchova", "jmeno": "Verča Průchová", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "2-7", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "vita-bogac", "jmeno": "Vita Bogac", "kdo": "", "svet": "Komunita a známí", "blizkost": "Okruh", "tel": "+420602230844", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "vlcek-daniel", "jmeno": "Vlček Daniel", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420604841593", "email": "daniel.612.vlcek@gmail.com", "narozeniny": "5-31", "rokNarozeni": "2006", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "william-fleetwood", "jmeno": "William Fleetwood", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420725712354", "email": "williamgfleetwood@gmail.com", "narozeniny": "6-27", "rokNarozeni": "2005", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "simon-korinek", "jmeno": "Šimon Kořínek", "kdo": "", "svet": "Kamarádi", "blizkost": "Okruh", "tel": "+420601026466", "email": "simon.korinek123@gmail.com", "narozeniny": "10-20", "rokNarozeni": "2004", "svatek": "12-22", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "ladislav-olsbauer", "jmeno": "Ladislav Olsbauer", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "6-27", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "alex-cahova", "jmeno": "Alex Cahová", "kdo": "sousedka", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "", "email": "", "narozeniny": "4-6", "rokNarozeni": "", "svatek": "4-21", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "babicka-albina", "jmeno": "Babička Albína", "kdo": "od Báry", "svet": "Bára a její lidi", "blizkost": "Síť", "tel": "+420736136194", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "mama-od-bary", "jmeno": "Máma od Báry", "kdo": "Bářina máma", "svet": "Bára a její lidi", "blizkost": "Síť", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "zdenka-zlatuskova-ml", "jmeno": "Zdeňka Zlatušková ml.", "kdo": "sestřenice, nevlastní", "svet": "Širší rodina", "blizkost": "Síť", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "6-23", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "david", "jmeno": "David", "kdo": "Sářin přítel", "svet": "Bára a její lidi", "blizkost": "Síť", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "12-30", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "deda-mirek", "jmeno": "Děda Mirek", "kdo": "od Báry", "svet": "Bára a její lidi", "blizkost": "Síť", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "kristyna-simonovska", "jmeno": "Kristýna Šimonovská", "kdo": "známá", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "7-24", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "adam", "jmeno": "Adam", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420607034563", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "adam-ryba", "jmeno": "Adam Ryba", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420723604164", "email": "adam.rybaa@gmail.com", "narozeniny": "9-29", "rokNarozeni": "2002", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "adam-rypl", "jmeno": "Adam Rypl", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420602457817", "email": "adam.rypl@gmail.com", "narozeniny": "9-28", "rokNarozeni": "2002", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "adam-zika", "jmeno": "Adam Zika", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420605317178", "email": "adam.zika007@gmail.com", "narozeniny": "8-20", "rokNarozeni": "2004", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "adamko", "jmeno": "Adamko", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420774561790", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "adela-marakova", "jmeno": "Adéla Maráková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420722227136", "email": "adelamarakova119@gmail.com", "narozeniny": "11-9", "rokNarozeni": "2004", "svatek": "9-2", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "adela-zahradnickova", "jmeno": "Adéla Zahradníčková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420736239286", "email": "", "narozeniny": "4-27", "rokNarozeni": "2000", "svatek": "9-2", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "adelka-jehlickova", "jmeno": "Adélka Jehličková", "kdo": "ze střední", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420605988700", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "adelka-mandikova", "jmeno": "Adélka Mandíková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420731070252", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "albert-levicek", "jmeno": "Albert Levíček", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420605914205", "email": "albert.levicek@gmail.com", "narozeniny": "1-19", "rokNarozeni": "2006", "svatek": "11-21", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "albert-vizner", "jmeno": "Albert Vízner", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420724120707", "email": "albert.vizner02@gmail.com", "narozeniny": "5-17", "rokNarozeni": "2002", "svatek": "11-21", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "alexander-hill", "jmeno": "Alexander Hill", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420607468784", "email": "alexanderhill@email.cz", "narozeniny": "6-12", "rokNarozeni": "2005", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "ales-chytil", "jmeno": "Aleš Chytil", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420736524217", "email": "ales.chytil@post.cz", "narozeniny": "9-10", "rokNarozeni": "2002", "svatek": "4-13", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "andrea-obersteinova", "jmeno": "Andrea Obersteinová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420722507083", "email": "ajaobersteinova@gmail.com", "narozeniny": "4-20", "rokNarozeni": "2004", "svatek": "9-26", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "anet", "jmeno": "Anet", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420608966953", "email": "anetakmetikova02@gmail.com", "narozeniny": "11-5", "rokNarozeni": "2002", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "aneta-brodska", "jmeno": "Aneta Brodská", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420739159300", "email": "aneta.brodska@icloud.com", "narozeniny": "1-29", "rokNarozeni": "2006", "svatek": "5-17", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "anezka-margholdova", "jmeno": "Anežka Margholdová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420731626048", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "3-2", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "anna-gina-bokova", "jmeno": "Anna Gina Boková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420722035840", "email": "anna.gina.bokova@gmail.com", "narozeniny": "6-9", "rokNarozeni": "2006", "svatek": "7-26", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "antonin-muller", "jmeno": "Antonín Müller", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420778890038", "email": "Tonikmu@gmail.com", "narozeniny": "8-22", "rokNarozeni": "2002", "svatek": "6-13", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "barbora-kyptova", "jmeno": "Barbora Kyptová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420736276834", "email": "barca.kyptova@gmail.com", "narozeniny": "2-11", "rokNarozeni": "2004", "svatek": "12-4", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "barbora-moulisova", "jmeno": "Barbora Moulisová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420725805063", "email": "moulisova.bara@seznam.cz", "narozeniny": "1-31", "rokNarozeni": "2003", "svatek": "12-4", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "barca-karvinna", "jmeno": "Barca Karvinna", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420725858764", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "bui-thi-minh-ly", "jmeno": "Bui Thi Minh Ly", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420775915438", "email": "minhlybui@seznam.cz", "narozeniny": "7-29", "rokNarozeni": "2000", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "chi-karvina", "jmeno": "Chi Karvina", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+48579379477", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "dan-babczynsky", "jmeno": "Dan Babczynský", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "david-drabek", "jmeno": "David Drábek", "kdo": "Justýnin táta, Studio Dva", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "", "email": "drabinski@seznam.cz", "narozeniny": "", "rokNarozeni": "", "svatek": "12-30", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "david-izak", "jmeno": "David Izák", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420775107751", "email": "dadakizakovitch@gmail.com", "narozeniny": "11-4", "rokNarozeni": "2005", "svatek": "12-30", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "david-s-timimimi", "jmeno": "David S - Timimimi", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420774436956", "email": "semanisin.d@gmail.com", "narozeniny": "8-6", "rokNarozeni": "2003", "svatek": "12-30", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "david-stantejsky", "jmeno": "David Štantejský", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420602516190", "email": "d.stantejsky@gmail.com", "narozeniny": "8-10", "rokNarozeni": "2006", "svatek": "12-30", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "denis-moravec", "jmeno": "Denis Moravec", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420606830039", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "denisa-tepla", "jmeno": "Denisa Teplá", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420607030674", "email": "tepla.den@gmail.com", "narozeniny": "6-13", "rokNarozeni": "2002", "svatek": "9-11", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "dominika-polakova", "jmeno": "Dominika Poláková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420777944695", "email": "polakovadominika5@gmail.com", "narozeniny": "11-15", "rokNarozeni": "2005", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "eliska-doleckova", "jmeno": "Eliška Dolečková", "kdo": "Lukášova partnerka", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420608920039", "email": "doleckovaeli@gmail.com", "narozeniny": "", "rokNarozeni": "", "svatek": "10-5", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "eliska-pohlova", "jmeno": "Eliška Pohlová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420776408052", "email": "eli.pohlova@gmail.com", "narozeniny": "3-3", "rokNarozeni": "2003", "svatek": "10-5", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "eliska-popelakova", "jmeno": "Eliška Popeláková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420604802007", "email": "popelakova.eli@gmail.com", "narozeniny": "11-27", "rokNarozeni": "2003", "svatek": "10-5", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "ellen-timi", "jmeno": "Ellen timi", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420602829095", "email": "ekejdova@gmail.com", "narozeniny": "5-2", "rokNarozeni": "2004", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "filip-hlavaty", "jmeno": "Filip Hlavatý", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420732335143", "email": "filip242hlavaty@gmail.com", "narozeniny": "2-24", "rokNarozeni": "2003", "svatek": "5-26", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "filip-zarobsky", "jmeno": "Filip Zárobský", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420731042453", "email": "filip.zarobsky@oavin.eu", "narozeniny": "6-7", "rokNarozeni": "2001", "svatek": "5-26", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "frederika-flegrova", "jmeno": "Frederika Flegrová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420733303834", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "gabi-fanaru", "jmeno": "Gabi Fanaru", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420773270522", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "gabriela-dlouha", "jmeno": "Gabriela Dlouhá", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420730842142", "email": "gdlouha@pef.czu.cz", "narozeniny": "", "rokNarozeni": "", "svatek": "3-8", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "hanca-flenerova", "jmeno": "Hanča Flenerová", "kdo": "ze střední", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420728922107", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "honza-chmelik", "jmeno": "Honza Chmelík", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420774302399", "email": "chmelik338@gmail.com", "narozeniny": "11-11", "rokNarozeni": "2005", "svatek": "6-24", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "honzik-jan-hospodar", "jmeno": "Honzik Jan Hospodar", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420737060814", "email": "janhospodar111104@gmail.com", "narozeniny": "11-11", "rokNarozeni": "2004", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "iveta-hessingova", "jmeno": "Iveta Hessingova", "kdo": "Sophiina máma", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420724022943", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "jakub-hajek", "jmeno": "Jakub Hájek", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420721964682", "email": "hajekjakub@pef.czu.cz", "narozeniny": "6-23", "rokNarozeni": "2004", "svatek": "7-25", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "jan-karvina", "jmeno": "Jan Karvina", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420733253436", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "6-24", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "jan-kristian-moravec", "jmeno": "Jan Kristian Moravec", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420733187435", "email": "jankristianmoravec@email.cz", "narozeniny": "", "rokNarozeni": "", "svatek": "6-24", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "jan-machaty", "jmeno": "Jan Machatý", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420734606801", "email": "janmachaty03@gmail.com", "narozeniny": "7-24", "rokNarozeni": "2003", "svatek": "6-24", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "jan-cech", "jmeno": "Jan Čech", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420607400747", "email": "cechjanskola@gmail.com", "narozeniny": "11-8", "rokNarozeni": "2004", "svatek": "6-24", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "jana-bernaskova", "jmeno": "Jana Bernášková", "kdo": "Justýnina máma, herečka", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420603918339", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "5-24", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "jiricek", "jmeno": "Jiříček", "kdo": "mámin bratranec", "svet": "Širší rodina", "blizkost": "Síť", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "4-24", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "jonas", "jmeno": "Jonas", "kdo": "ex kouč, tiimi", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420727944034", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "9-27", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "jonas-kouc", "jmeno": "Jonas Kouc", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420606358931", "email": "plichta@pef.czu.cz", "narozeniny": "12-16", "rokNarozeni": "1999", "svatek": "9-27", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "josef-bolen", "jmeno": "Josef Bolen", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420734315802", "email": "bep.bolen@gmail.com", "narozeniny": "8-7", "rokNarozeni": "2002", "svatek": "3-19", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "josh-curran", "jmeno": "Josh Curran", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420604299070", "email": "", "narozeniny": "2-7", "rokNarozeni": "2005", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "julie-hola", "jmeno": "Julie Holá", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420777902646", "email": "juliehola6@gmail.com", "narozeniny": "3-31", "rokNarozeni": "2006", "svatek": "12-10", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "jachym-broncek", "jmeno": "Jáchym Bronček", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420775602617", "email": "jachym.broncek@gmail.com", "narozeniny": "7-22", "rokNarozeni": "2005", "svatek": "8-16", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "karel-karvina", "jmeno": "Karel Karvina", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420733253437", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "11-4", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "karel-munzar", "jmeno": "Karel Munzar", "kdo": "ze střední", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420702127181", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "11-4", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "katerina-burianova", "jmeno": "Kateřina Burianová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420605915743", "email": "buriankatka@gmail.com", "narozeniny": "1-23", "rokNarozeni": "2003", "svatek": "11-25", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "katerina-ostrizkova", "jmeno": "Kateřina Ostřížková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420721004597", "email": "katerina.ostrizkova@email.cz", "narozeniny": "11-12", "rokNarozeni": "2003", "svatek": "11-25", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "katrin-krystofova", "jmeno": "Katrin Kryštofová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420730104920", "email": "katrinka.krystofova@gmail.com", "narozeniny": "4-19", "rokNarozeni": "2004", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "konarik", "jmeno": "Konarik", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420737246891", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "kristy", "jmeno": "Kristy", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420777746644", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "kristyna-od-willa", "jmeno": "Kristyna Od Willa", "kdo": "pomohl jsem jí", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420777545666", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "7-24", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "kristyna-tiimi-karvina", "jmeno": "Kristyna Tiimi Karvina", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420603943494", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "7-24", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "krystof-kuptik", "jmeno": "Kryštof Kuptík", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420775443732", "email": "kuptikkrystof@gmail.com", "narozeniny": "2-18", "rokNarozeni": "2002", "svatek": "9-18", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "kaja-havlova", "jmeno": "Kája Havlová", "kdo": "Matyho partnerka", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420775667492", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "7-14", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "laura-buryskova", "jmeno": "Laura Burýšková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420606760852", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "6-1", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "laura-stejskalova", "jmeno": "Laura Stejskalová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420777525265", "email": "lalaura1928@gmail.com", "narozeniny": "3-25", "rokNarozeni": "2003", "svatek": "6-1", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "laura-simunkova", "jmeno": "Laura Šimůnková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420734181844", "email": "laurasimunkova1@gmail.com", "narozeniny": "2-26", "rokNarozeni": "2005", "svatek": "6-1", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "lea-maria-vrzackova", "jmeno": "Lea Maria Vrzáčková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420733221601", "email": "lea.vrzackova@gmail.com", "narozeniny": "7-20", "rokNarozeni": "2005", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "lena", "jmeno": "Lena", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420702625122", "email": "lenasterbovaa@gmail.com", "narozeniny": "10-3", "rokNarozeni": "2003", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "lena-sterbova", "jmeno": "Lena Štěrbova", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420702625112", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "lenka", "jmeno": "Lenka", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420603843502", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "2-21", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "lenka-melkova", "jmeno": "Lenka Melková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420730686471", "email": "lenickamelkova@gmail.com", "narozeniny": "12-7", "rokNarozeni": "2003", "svatek": "2-21", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "lucie-mnouckouva", "jmeno": "Lucie Mnouckouva", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420607419580", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "12-13", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "lukas", "jmeno": "Lukas", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420420774534829", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "10-18", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "lukas-krejza", "jmeno": "Lukas Krejza", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420734171006", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "10-18", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "lukas-vorac", "jmeno": "Lukáš Voráč", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420725841190", "email": "lvbusiness@seznam.cz", "narozeniny": "2-13", "rokNarozeni": "2004", "svatek": "10-18", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "magda-brozikova", "jmeno": "Magda Brozikova", "kdo": "Nelina kamarádka", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420602256304", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "magdalena-cernikova", "jmeno": "Magdalena Černíková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420777531866", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "7-22", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "marek-capela", "jmeno": "Marek Čapela", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420792302887", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "4-25", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "marie-benesova", "jmeno": "Marie Benešová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420774881121", "email": "benesova28@gmail.com", "narozeniny": "10-28", "rokNarozeni": "2000", "svatek": "9-12", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "marie-kozakova", "jmeno": "Marie Kozáková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420732203709", "email": "m.kozakova256@gmail.com", "narozeniny": "8-29", "rokNarozeni": "2004", "svatek": "9-12", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "marie-machytkova", "jmeno": "Marie Machytková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420731572402", "email": "mmachytkova2004@gmail.com", "narozeniny": "9-3", "rokNarozeni": "2004", "svatek": "9-12", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "marko-petrovic", "jmeno": "Marko Petrovič", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420608444885", "email": "markopetrovic.mp75@gmail.com", "narozeniny": "7-30", "rokNarozeni": "2005", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "martina-cifkova", "jmeno": "Martina Cifková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "7-17", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "martina-novotna-timi-new-coach", "jmeno": "Martina Novotna Timi New Coach", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420604876508", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "7-17", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "matous-krcmar", "jmeno": "Matouš Krčmář", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420601100552", "email": "matouskrcmar@gmail.com", "narozeniny": "6-25", "rokNarozeni": "2003", "svatek": "9-21", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "matousek-kubka", "jmeno": "Matoušek kubka", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420776236826", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "maty-bily", "jmeno": "Maty Bílý", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420607250021", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "matyas-bogac", "jmeno": "Matyas Bogac", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420705111222", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "matyas-morgenstern", "jmeno": "Matyas Morgenstern", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420605217525", "email": "", "narozeniny": "11-24", "rokNarozeni": "2004", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "matyas-broncek", "jmeno": "Matyáš Bronček", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420773090694", "email": "matyas.broncek@gmail.com", "narozeniny": "4-1", "rokNarozeni": "2003", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "matyas-hodek", "jmeno": "Matyáš Hodek", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420730945000", "email": "matyhodek@gmail.com", "narozeniny": "6-28", "rokNarozeni": "2005", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "matyas-macek", "jmeno": "Matyáš Macek", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420606767247", "email": "matym.macek@seznam.cz", "narozeniny": "5-5", "rokNarozeni": "2004", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "matyas-morgenstejn", "jmeno": "Matyáš Morgenštejn", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "matej-hrncir", "jmeno": "Matěj Hrnčíř", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420732468703", "email": "matej.hrncir.2@gmail.com", "narozeniny": "3-24", "rokNarozeni": "2006", "svatek": "2-24", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "matej-vrbas", "jmeno": "Matěj Vrbas", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420773113692", "email": "matejvrbas@gmail.com", "narozeniny": "6-20", "rokNarozeni": "2005", "svatek": "2-24", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "max-heindl", "jmeno": "Max Heindl", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420775787030", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "michael-petschat", "jmeno": "Michael Petschat", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420737763437", "email": "petschatm@gmail.com", "narozeniny": "10-17", "rokNarozeni": "2003", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "michaela-ritterova", "jmeno": "Michaela Ritterová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420722262464", "email": "michalka.ritterova@seznam.cz", "narozeniny": "3-22", "rokNarozeni": "2003", "svatek": "10-19", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "michaela-vyskocilova", "jmeno": "Michaela Vyskočilová", "kdo": "ex učitelka, střední", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "", "email": "m-vyskocilova@kollarovka.cz", "narozeniny": "", "rokNarozeni": "", "svatek": "10-19", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "michal-chamrad", "jmeno": "Michal Chamrád", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420720943564", "email": "michalchamrad@gmail.com", "narozeniny": "4-6", "rokNarozeni": "2002", "svatek": "9-29", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "michal-slegl", "jmeno": "Michal Šlégl", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420777930823", "email": "sleglmichal7@gmail.com", "narozeniny": "6-10", "rokNarozeni": "2002", "svatek": "9-29", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "mikulas-prochazka", "jmeno": "Mikuláš Procházka", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420607663445", "email": "mikproch21@gmail.com", "narozeniny": "7-3", "rokNarozeni": "2004", "svatek": "12-6", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "mirdzi-mira", "jmeno": "Mirdzi Míra", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420777515525", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "mirek-konarik", "jmeno": "Mirek Koňařík", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420605735656", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "monika-kosulicova", "jmeno": "Monika Košuličová", "kdo": "koučka, tiimi", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420777870279", "email": "kosulicova@pef.czu.cz", "narozeniny": "", "rokNarozeni": "", "svatek": "5-21", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "monika-nemeckova", "jmeno": "Monika Němečková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420604392997", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "5-21", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "monika-sobotkova", "jmeno": "Monika Sobotková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420606659974", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "5-21", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "misa-prosova", "jmeno": "Míša Prosová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420777768132", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "natala-velisek", "jmeno": "Natala Velisek", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420722446451", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "natalie-bendova", "jmeno": "Natálie Bendová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420607895618", "email": "Bendova-natalie@seznam.cz", "narozeniny": "5-10", "rokNarozeni": "2003", "svatek": "12-21", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "natalie-minuthova", "jmeno": "Natálie Minuthová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420735281088", "email": "minutnaty@gmail.com", "narozeniny": "12-8", "rokNarozeni": "2005", "svatek": "12-21", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "niklas-kovanda", "jmeno": "Niklas Kovanda", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420732285653", "email": "niklas.kovanda@gmail.com", "narozeniny": "9-18", "rokNarozeni": "2004", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "oliver-sobotka", "jmeno": "Oliver Sobotka", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420605388068", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "ondra-sebek", "jmeno": "Ondra Šebek", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420773831696", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "11-30", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "ondrej-bleha", "jmeno": "Ondřej Bleha", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420607772201", "email": "bleha.ondrej@gmail.com", "narozeniny": "6-1", "rokNarozeni": "2003", "svatek": "11-30", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "ondrej-filipi", "jmeno": "Ondřej Filipi", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420722213233", "email": "ondrafilipi3@gmail.com", "narozeniny": "12-6", "rokNarozeni": "2001", "svatek": "11-30", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "ondrej-kulhavy", "jmeno": "Ondřej Kulhavý", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420774246513", "email": "okulhav@gmail.com", "narozeniny": "5-26", "rokNarozeni": "2005", "svatek": "11-30", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "ondrej-schloras", "jmeno": "Ondřej Schloras", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420725888319", "email": "O.Schlossar@seznam.cz", "narozeniny": "12-12", "rokNarozeni": "2003", "svatek": "11-30", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "pavlina-palova", "jmeno": "Pavlína Palová", "kdo": "ex učitelka, střední", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420733738174", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "8-31", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "petr-hazlbauer", "jmeno": "Petr Hazlbauer", "kdo": "ze střední", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420739512630", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "2-22", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "petr-hofman", "jmeno": "Petr Hofman", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420604752628", "email": "p.hofman258@gmail.com", "narozeniny": "11-5", "rokNarozeni": "2003", "svatek": "2-22", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "petr-svalb", "jmeno": "Petr Švalb", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420724590144", "email": "petr.svalb@gmail.com", "narozeniny": "", "rokNarozeni": "", "svatek": "2-22", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "radim-sobotka", "jmeno": "Radim Sobotka", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420728165135", "email": "1.radim.sobotka@gmail.com", "narozeniny": "12-30", "rokNarozeni": "2003", "svatek": "8-25", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "robin-od-bena", "jmeno": "Robin od Bena", "kdo": "Benův člověk", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "", "email": "", "narozeniny": "3-1", "rokNarozeni": "", "svatek": "1-30", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "rychie-krystof", "jmeno": "Rychie Kryštof", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420605324904", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "sabca-cerstva", "jmeno": "Sabča Cerstva", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420720179395", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "sana", "jmeno": "Sana", "kdo": "Team Academy, Británie", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+447725736548", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "silvie-kuryljakova", "jmeno": "Silvie Kuryljaková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420774421459", "email": "silvie.kurylyak@email.cz", "narozeniny": "11-1", "rokNarozeni": "2002", "svatek": "10-29", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "simon-ludvik", "jmeno": "Simon Ludvik", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420605002961", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "12-22", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "simona-spadova", "jmeno": "Simona Špádová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420736120526", "email": "simona.spadova@gmail.com", "narozeniny": "2-12", "rokNarozeni": "2001", "svatek": "12-12", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "sofiya-ryashko", "jmeno": "Sofiya Ryashko", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420776255311", "email": "sofiya.ryashko@gmail.com", "narozeniny": "10-22", "rokNarozeni": "2005", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "sara-dvorakova", "jmeno": "Sára Dvořáková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420774353331", "email": "sd.01@seznam.cz", "narozeniny": "10-10", "rokNarozeni": "2001", "svatek": "10-9", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "teo-schinko", "jmeno": "Teo Schinko", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "tereza-brabcova", "jmeno": "Tereza Brabcová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420778140128", "email": "brabcovaterezka@gmail.com", "narozeniny": "9-17", "rokNarozeni": "2003", "svatek": "10-15", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "tereza-fleischmannova", "jmeno": "Tereza Fleischmannová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420722666669", "email": "terkafleischmann@gmail.com", "narozeniny": "10-2", "rokNarozeni": "2000", "svatek": "10-15", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "tereza-horakova", "jmeno": "Tereza Horáková", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420604637738", "email": "xhort028@studenti.czu.cz", "narozeniny": "5-5", "rokNarozeni": "2004", "svatek": "10-15", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "tereza-lendvaiova", "jmeno": "Tereza Lendvaiová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420777336151", "email": "tereza.lendvai@gmail.com", "narozeniny": "9-6", "rokNarozeni": "2004", "svatek": "10-15", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "terka-stoklasova", "jmeno": "Terka Stoklasova", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420605575031", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "10-15", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "theo-hessing", "jmeno": "Theo Hessing", "kdo": "Sophiin táta", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420602668576", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "tomas-protiva", "jmeno": "Tomáš Protiva", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420735120530", "email": "protitom@gmail.com", "narozeniny": "5-23", "rokNarozeni": "2006", "svatek": "3-7", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "tomas-sedlacek", "jmeno": "Tomáš Sedláček", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420606070586", "email": "tomas.sedlacek.ip@gmail.com", "narozeniny": "5-17", "rokNarozeni": "2003", "svatek": "3-7", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "tynka-hrbkova", "jmeno": "Týnka Hrbková", "kdo": "ze střední", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420776360141", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "veronika-honsova", "jmeno": "Veronika Honsová", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420774905990", "email": "verunkah1478@gmail.com", "narozeniny": "11-28", "rokNarozeni": "2005", "svatek": "2-7", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "verca-barina", "jmeno": "Verča (Bářina)", "kdo": "ex-spolubydlící Báry", "svet": "Bára a její lidi", "blizkost": "Síť", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "2-7", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "vilem-suchanek", "jmeno": "Vilém Suchánek", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420775441616", "email": "vilem.suchanek@gmail.com", "narozeniny": "12-21", "rokNarozeni": "1999", "svatek": "5-28", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "vojta-svethymzu-czu", "jmeno": "Vojta (svethymzu CZU)", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420603766636", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "vojta-sobotka", "jmeno": "Vojta Sobotka", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420736116547", "email": "vojta.sobotka@icloud.com", "narozeniny": "9-11", "rokNarozeni": "2004", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "vojta-sadek", "jmeno": "Vojta Šádek", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420739506093", "email": "vojtechsadek27@gmail.com", "narozeniny": "5-23", "rokNarozeni": "2006", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "vojtech-kozak", "jmeno": "Vojtěch Kozák", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420722778866", "email": "kozakv@pef.czu.cz", "narozeniny": "9-25", "rokNarozeni": "2001", "svatek": "4-23", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "vojtech-krcho", "jmeno": "Vojtěch Krcho", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420737673433", "email": "vojtechkrcho@icloud.com", "narozeniny": "4-2", "rokNarozeni": "2004", "svatek": "4-23", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "vojtech-manour", "jmeno": "Vojtěch Maňour", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420775345116", "email": "vojtech.manour@gmail.com", "narozeniny": "3-11", "rokNarozeni": "2005", "svatek": "4-23", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "vojtech-svatek", "jmeno": "Vojtěch Svatek", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420773171588", "email": "vojsvatek@gmail.com", "narozeniny": "7-23", "rokNarozeni": "2003", "svatek": "4-23", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "vaclav-bajko", "jmeno": "Václav Bajko", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420728473215", "email": "vaclavbajko36@gmail.com", "narozeniny": "6-26", "rokNarozeni": "2004", "svatek": "9-28", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "vaclav-svec", "jmeno": "Václav Švec", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420777915625", "email": "svec@pef.czu.cz", "narozeniny": "", "rokNarozeni": "", "svatek": "9-28", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "zdenek-coubal", "jmeno": "Zdeněk Coubal", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420608797119", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "1-23", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "zdenek-lustig", "jmeno": "Zdeněk Lustig", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420603551062", "email": "lustigz@pef.czu.cz", "narozeniny": "", "rokNarozeni": "", "svatek": "1-23", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "zdenka-zlatuskova", "jmeno": "Zdeňka Zlatušková", "kdo": "teta, nevlastní", "svet": "Širší rodina", "blizkost": "Síť", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "6-23", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "zita-babczynska", "jmeno": "Zita Babczynská", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "9-19", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "zuza-piknerova-timi", "jmeno": "Zuza Piknerova Timi", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420739035055", "email": "zuzana.piknerova@seznam.cz", "narozeniny": "8-17", "rokNarozeni": "2003", "svatek": "", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "zuzi-turinska", "jmeno": "Zuzi Turinska", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420702036370", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "max-kriv-hraba", "jmeno": "max Křiv Hraba", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420722765458", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "zuzii", "jmeno": "zuzii", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420606076033", "email": "zuzana@lhota.us", "narozeniny": "", "rokNarozeni": "", "svatek": "", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "simon-pavek", "jmeno": "Šimon Pavek", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420725985405", "email": "simonpavek03@seznam.cz", "narozeniny": "11-27", "rokNarozeni": "2003", "svatek": "12-22", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}, {"id": "stepan", "jmeno": "Štěpán", "kdo": "Stázin táta", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420776696070", "email": "", "narozeniny": "", "rokNarozeni": "", "svatek": "12-26", "pratNarozeniny": false, "pratSvatek": false, "cas": ""}, {"id": "stepan-felcarek", "jmeno": "Štěpán Felčárek", "kdo": "", "svet": "Komunita a známí", "blizkost": "Síť", "tel": "+420604468326", "email": "stepanfelcarek333@gmail.com", "narozeniny": "7-21", "rokNarozeni": "2004", "svatek": "12-26", "pratNarozeniny": true, "pratSvatek": false, "cas": ""}], "fronta": [{"id": "narozeniny-bui-thi-minh-ly-2026-07-29", "osobaId": "bui-thi-minh-ly", "typ": "narozeniny", "datum": "2026-07-29", "cas": "", "text": "", "stav": "chybi"}, {"id": "narozeniny-marko-petrovic-2026-07-30", "osobaId": "marko-petrovic", "typ": "narozeniny", "datum": "2026-07-30", "cas": "", "text": "", "stav": "chybi"}, {"id": "narozeniny-vladimir-kludaj-2026-08-03", "osobaId": "vladimir-kludaj", "typ": "narozeniny", "datum": "2026-08-03", "cas": "", "text": "", "stav": "chybi"}, {"id": "narozeniny-marek-smidl-2026-08-03", "osobaId": "marek-smidl", "typ": "narozeniny", "datum": "2026-08-03", "cas": "", "text": "", "stav": "chybi"}, {"id": "narozeniny-david-s-timimimi-2026-08-06", "osobaId": "david-s-timimimi", "typ": "narozeniny", "datum": "2026-08-06", "cas": "", "text": "", "stav": "chybi"}, {"id": "narozeniny-josef-bolen-2026-08-07", "osobaId": "josef-bolen", "typ": "narozeniny", "datum": "2026-08-07", "cas": "", "text": "", "stav": "chybi"}, {"id": "narozeniny-milan-cap-2026-08-08", "osobaId": "milan-cap", "typ": "narozeniny", "datum": "2026-08-08", "cas": "", "text": "", "stav": "chybi"}, {"id": "narozeniny-david-stantejsky-2026-08-10", "osobaId": "david-stantejsky", "typ": "narozeniny", "datum": "2026-08-10", "cas": "", "text": "", "stav": "chybi"}, {"id": "narozeniny-zuza-piknerova-timi-2026-08-17", "osobaId": "zuza-piknerova-timi", "typ": "narozeniny", "datum": "2026-08-17", "cas": "", "text": "", "stav": "chybi"}, {"id": "svatek-helena-petrova-2026-08-18", "osobaId": "helena-petrova", "typ": "svatek", "datum": "2026-08-18", "cas": "", "text": "", "stav": "chybi"}, {"id": "narozeniny-adam-zika-2026-08-20", "osobaId": "adam-zika", "typ": "narozeniny", "datum": "2026-08-20", "cas": "", "text": "", "stav": "chybi"}, {"id": "narozeniny-antonin-muller-2026-08-22", "osobaId": "antonin-muller", "typ": "narozeniny", "datum": "2026-08-22", "cas": "", "text": "", "stav": "chybi"}], "odeslane": []};
+
+var D=null;            // data z Drivu
+var nacteno=null;      // {id, modifiedTime} souboru, ze ktereho jsme cetli
+var spinave=false;
+var tab="fronta";
+var lidiFiltr="vse", lidiHledej="", lidiOtevreny=null;
+var novaVyber=null, novaDatum=null, novaHledej="";
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function fold(s){ return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
+function dnesStr(){ var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function hezkyDatum(iso){
+  var p=iso.split("-").map(Number); var d=new Date(p[0],p[1]-1,p[2]);
+  return DNY[d.getDay()]+" "+p[2]+". "+MESICE[p[1]-1];
+}
+function osoba(id){ for(var i=0;i<D.lide.length;i++) if(D.lide[i].id===id) return D.lide[i]; return null; }
+function vychoziCas(){ return (D&&D.nastaveni&&D.nastaveni.vychoziCas)||"09:00"; }
+function casPro(f){ var p=osoba(f.osobaId); return f.cas||(p&&p.cas)||vychoziCas(); }
+function toast(t){ var el=$("toast"); el.textContent=t; el.classList.add("videt"); clearTimeout(el._t); el._t=setTimeout(function(){ el.classList.remove("videt"); },2200); }
+function stav(text, druh){
+  $("stavRadek").innerHTML='<span class="stav-tecka '+(druh||"")+'"></span>'+esc(text);
+}
+function smsOdkaz(tel, text){ return "sms:"+encodeURIComponent(tel.replace(/\s+/g,""))+"&body="+encodeURIComponent(text); }
+
+/* ---------- MCP vrstva ---------- */
+function mcpChybi(){
+  $("sekce-fronta").innerHTML='<div class="banner"><b>Stránka nemá spojení</b>Otevři ji v aplikaci Claude nebo na claude.ai, jinak se k datům nedostane.</div>';
+}
+function popisChyby(e){
+  var kod=e&&e.code;
+  if(kod==="needs_reauth") return {t:"Google Drive potřebuje znovu připojit. Otevři claude.ai, Nastavení, Konektory a obnov přihlášení.", d:"chyba"};
+  if(kod==="server_not_connected") return {t:"Google Drive není připojený. Přidej ho na claude.ai v Nastavení, Konektory.", d:"chyba"};
+  if(kod==="selection_required") return {t:"Máš připojených víc účtů Google Drive. Vyber jeden ve výzvě, která se ukázala, a načti znovu.", d:"pozor"};
+  if(kod==="server_unavailable") return {t:"Drive zrovna neodpovídá. Zkusím to znovu.", d:"pozor", retry:true};
+  if(kod==="not_granted"||kod==="capability_disabled"||kod==="capability_removed") return {t:"Tahle verze aplikace stránce nedovolí sáhnout na Drive. Otevři ji znovu na claude.ai.", d:"chyba"};
+  if(kod==="tool_error") return {t:"Drive vrátil chybu: "+(e.message||"neznámá"), d:"chyba"};
+  return {t:"Nepovedlo se: "+((e&&e.message)||"neznámá chyba"), d:"chyba"};
+}
+function zavolej(nastroj, vstup, moznosti){
+  return window.claude.mcp.callTool(SERVER, nastroj, vstup, moznosti);
+}
+function payload(res){
+  var p=res&&res.payload;
+  if(typeof p==="string"){ try{ return JSON.parse(p); }catch(_e){ return p; } }
+  return p;
+}
+
+/* ---------- nacteni ---------- */
+function najdiNejnovejsi(){
+  return zavolej("search_files",{query:"parentId = '"+SLOZKA+"' and title contains 'prani-data'", pageSize:25, excludeContentSnippets:true},{cache:false})
+  .then(function(res){
+    var p=payload(res)||{}; var soubory=p.files||[];
+    if(!soubory.length) return null;
+    soubory.sort(function(a,b){ return (b.modifiedTime||"").localeCompare(a.modifiedTime||""); });
+    return soubory[0];
+  });
+}
+function stahni(fileId){
+  return zavolej("download_file_content",{fileId:fileId},{cache:false}).then(function(res){
+    var p=payload(res)||{};
+    var bin=atob(p.content||"");
+    var bajty=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) bajty[i]=bin.charCodeAt(i);
+    return JSON.parse(new TextDecoder("utf-8").decode(bajty));
+  });
+}
+function nacti(pokus){
+  if(!window.claude||window.claude.mcp===undefined){ mcpChybi(); return; }
+  stav("Načítám z Drivu...");
+  najdiNejnovejsi().then(function(soubor){
+    if(!soubor){ stav("Na Drivu zatím nejsou data", "pozor");
+      $("sekce-fronta").innerHTML='<div class="banner"><b>Začínáme</b>Na Drivu ještě není soubor s daty. Jedním klepnutím se založí startovní seznam se všemi lidmi.'+
+        '<div class="k-akce"><button class="tl-akcent" id="tlZalozit">Založit data na Drivu</button></div></div>';
+      $("tlZalozit").onclick=function(){
+        D=JSON.parse(JSON.stringify(SEED)); doplnFrontu(); spinave=true; ukazListu(); uloz();
+      };
+      return; }
+    return stahni(soubor.id).then(function(data){
+      D=data; nacteno={id:soubor.id, modifiedTime:soubor.modifiedTime};
+      doplnFrontu(); spinave=false; ukazListu();
+      stav("Načteno "+new Date().toLocaleTimeString("cs-CZ",{hour:"2-digit",minute:"2-digit"}));
+      vykresli();
+    });
+  }).catch(function(e){
+    var ch=popisChyby(e);
+    if(ch.retry&&!pokus){ setTimeout(function(){ nacti(1); }, 1200+Math.random()*1200); }
+    stav(ch.t, ch.d);
+  });
+}
+
+/* ---------- generovani fronty ---------- */
+function doplnFrontu(){
+  var dnes=dnesStr();
+  var mam={}; (D.fronta||[]).forEach(function(f){ mam[f.id]=true; });
+  var ted=new Date();
+  for(var i=0;i<D.lide.length;i++){
+    var p=D.lide[i];
+    [["narozeniny",p.narozeniny,p.pratNarozeniny],["svatek",p.svatek,p.pratSvatek]].forEach(function(u){
+      if(!u[1]||!u[2]) return;
+      var md=u[1].split("-").map(Number);
+      for(var r=ted.getFullYear(); r<=ted.getFullYear()+1; r++){
+        var dt=new Date(r,md[0]-1,md[1]);
+        if(dt.getMonth()!==md[0]-1) continue;
+        var iso=r+"-"+String(md[0]).padStart(2,"0")+"-"+String(md[1]).padStart(2,"0");
+        var rozdil=(new Date(iso)-new Date(dnes))/86400000;
+        if(rozdil<0||rozdil>HORIZONT) continue;
+        var id=u[0]+"-"+p.id+"-"+iso;
+        if(!mam[id]){ D.fronta.push({id:id, osobaId:p.id, typ:u[0], datum:iso, cas:"", text:"", stav:"chybi"}); mam[id]=true; }
+      }
+    });
+  }
+  D.fronta.sort(function(a,b){ return (a.datum+casPro(a)).localeCompare(b.datum+casPro(b)); });
+}
+
+/* ---------- ulozeni ---------- */
+function sloucit(mistni, vzdalene){
+  // vzdalene vyhrava u stavu odeslano/selhalo a u logu odeslanych, mistni u textu a lidi
+  var stavy={}; (vzdalene.fronta||[]).forEach(function(f){ if(f.stav==="odeslano"||f.stav==="selhalo") stavy[f.id]=f; });
+  (mistni.fronta||[]).forEach(function(f){
+    var v=stavy[f.id]; if(v){ f.stav=v.stav; f.odeslanoKdy=v.odeslanoKdy; }
+  });
+  var mamO={}; (mistni.odeslane||[]).forEach(function(o){ mamO[o.id]=true; });
+  (vzdalene.odeslane||[]).forEach(function(o){ if(!mamO[o.id]) mistni.odeslane.push(o); });
+  return mistni;
+}
+function uloz(){
+  if(!D||!spinave) return;
+  var tl=$("tlUlozit"); tl.disabled=true; $("ulozitText").textContent="Ukládám...";
+  najdiNejnovejsi().then(function(soubor){
+    var priprava=Promise.resolve(D);
+    if(soubor&&nacteno&&soubor.id!==nacteno.id){
+      priprava=stahni(soubor.id).then(function(vzdalene){ return sloucit(D, vzdalene); });
+    }
+    return priprava;
+  }).then(function(data){
+    data.aktualizovano=new Date().toISOString();
+    data.verze=(data.verze||0)+1;
+    return zavolej("create_file",{
+      title:NAZEV, parentId:SLOZKA, textContent:JSON.stringify(data),
+      contentMimeType:"application/json", disableConversionToGoogleType:true
+    });
+  }).then(function(res){
+    var p=payload(res)||{};
+    nacteno={id:p.id, modifiedTime:p.modifiedTime};
+    spinave=false; ukazListu(); vykresli(); toast("Uloženo");
+    stav("Uloženo "+new Date().toLocaleTimeString("cs-CZ",{hour:"2-digit",minute:"2-digit"}));
+  }).catch(function(e){
+    var kod=e&&e.code;
+    if(kod==="server_unavailable"||kod==="upstream_error"){
+      stav("Uložení nedoběhlo, možná ale prošlo. Načti znovu a zkontroluj.", "pozor");
+    } else { stav(popisChyby(e).t, "chyba"); }
+    toast("Uložení se nepovedlo");
+  }).finally(function(){ tl.disabled=false; $("ulozitText").textContent="Neuložené změny"; });
+}
+function zmena(){ spinave=true; ukazListu(); }
+function ukazListu(){ $("ulozitListu").classList.toggle("videt", spinave); }
+
+/* ---------- vykresleni ---------- */
+function vykresli(){
+  if(!D) return;
+  ["fronta","nova","lidi","poslane"].forEach(function(t){ $("sekce-"+t).hidden=(t!==tab); });
+  document.querySelectorAll("#taby button").forEach(function(b){ b.classList.toggle("aktivni", b.dataset.tab===tab); });
+  if(tab==="fronta") vykresliFrontu();
+  if(tab==="nova") vykresliNovou();
+  if(tab==="lidi") vykresliLidi();
+  if(tab==="poslane") vykresliPoslane();
+  var kDoplneni=D.fronta.filter(function(f){
+    if(f.stav==="vynechat"||f.stav==="odeslano") return false;
+    if(f.datum<dnesStr()) return false;
+    var p=osoba(f.osobaId);
+    return !f.text||!(p&&p.tel);
+  }).length;
+  var b=$("badgeFronta"); b.hidden=!kDoplneni; b.textContent=kDoplneni;
+}
+
+function chipTyp(typ){
+  if(typ==="narozeniny") return '<span class="chip narozeniny">🎂 narozeniny</span>';
+  if(typ==="svatek") return '<span class="chip svatek">🌼 svátek</span>';
+  return '<span class="chip zprava">✉️ zpráva</span>';
+}
+
+function vykresliFrontu(){
+  var el=$("sekce-fronta"), dnes=dnesStr(), html="";
+  var dotazy=(D.dotazy||[]).filter(function(q){ return !q.vyreseno; });
+  dotazy.forEach(function(q){
+    html+='<div class="banner"><b>Potřebuju rozhodnout</b>'+esc(q.text)+'<div class="k-akce">'+
+      q.volby.map(function(v){ var md=v.split("-"); return '<button class="tl-jemne" data-dotaz="'+esc(q.id)+'" data-volba="'+esc(v)+'">'+md[1]+". "+md[0]+".</button>"; }).join("")+
+      '</div></div>';
+  });
+  var polozky=D.fronta.filter(function(f){ return f.datum>=dnes&&f.stav!=="odeslano"; });
+  if(!polozky.length&&!dotazy.length){
+    html+='<div class="prazdno"><div class="velke">🎈</div>Dalších '+HORIZONT+' dní je klid.<br>Nikdo nemá narozeniny ani svátek.</div>';
+  }
+  var minuleDatum="";
+  polozky.forEach(function(f){
+    var p=osoba(f.osobaId); if(!p) return;
+    if(f.datum!==minuleDatum){
+      minuleDatum=f.datum;
+      var znacka=f.datum===dnes?' <span class="dnes">&middot; dnes</span>':"";
+      html+='<div class="den-hlava">'+hezkyDatum(f.datum)+znacka+'</div>';
+    }
+    var chipy=chipTyp(f.typ);
+    if(f.stav==="vynechat") chipy+='<span class="chip">vynecháno</span>';
+    else if(f.stav==="selhalo") chipy+='<span class="chip chyba">neodešlo</span>';
+    else if(!p.tel) chipy+='<span class="chip pozor">chybí číslo</span>';
+    else if(!f.text) chipy+='<span class="chip pozor">chybí text</span>';
+    else chipy+='<span class="chip ok">připraveno</span>';
+    html+='<div class="karta'+(f.stav==="vynechat"?" vynechana":"")+'" data-fid="'+esc(f.id)+'">'+
+      '<div class="k-hlava"><div><div class="k-jmeno">'+esc(p.jmeno)+'</div><div class="k-kdo">'+esc(p.kdo||p.svet||"")+'</div></div>'+
+      '<div class="chipy">'+chipy+'</div></div>';
+    if(f.stav!=="vynechat"){
+      html+='<div class="k-telo">'+
+        '<textarea data-pole="text" placeholder="Sem napiš, co se má poslat...">'+esc(f.text)+'</textarea>';
+      if(!p.tel) html+='<input type="tel" data-pole="tel" placeholder="Doplň telefon, třeba +420 606 123 456">';
+      html+='<div class="radek"><label>Odejde v</label><input type="time" data-pole="cas" value="'+esc(casPro(f))+'"></div></div>';
+    }
+    html+='<div class="k-akce">';
+    if(f.stav==="vynechat"){ html+='<button class="tl-jemne" data-akce="vratit">Vrátit do fronty</button>'; }
+    else{
+      html+='<button class="tl-jemne" data-akce="vynechat">Letos vynechat</button>';
+      if(p.tel&&f.text) html+='<a class="tl-ok" href="'+esc(smsOdkaz(p.tel,f.text))+'">Poslat hned ručně</a>';
+    }
+    html+='</div></div>';
+  });
+  el.innerHTML=html;
+
+  el.querySelectorAll("[data-dotaz]").forEach(function(b){ b.onclick=function(){
+    var q=(D.dotazy||[]).find(function(x){ return x.id===b.dataset.dotaz; }); if(!q) return;
+    var p=osoba(q.osobaId); if(p){ p.narozeniny=b.dataset.volba; p.pratNarozeniny=true; }
+    q.vyreseno=true; doplnFrontu(); zmena(); vykresli(); toast("Zapsáno");
+  }; });
+  el.querySelectorAll(".karta[data-fid]").forEach(function(k){
+    var f=D.fronta.find(function(x){ return x.id===k.dataset.fid; }); if(!f) return;
+    var p=osoba(f.osobaId);
+    var ta=k.querySelector("[data-pole=text]");
+    if(ta){
+      var roste=function(){ ta.style.height="auto"; ta.style.height=(ta.scrollHeight+2)+"px"; };
+      roste(); ta.addEventListener("input", function(){ f.text=ta.value; f.stav=f.text?"ceka":"chybi"; roste(); zmena(); });
+      ta.addEventListener("blur", function(){ vykresli(); });
+    }
+    var tel=k.querySelector("[data-pole=tel]");
+    if(tel) tel.addEventListener("change", function(){ if(p){ p.tel=tel.value.trim(); zmena(); vykresli(); } });
+    var cas=k.querySelector("[data-pole=cas]");
+    if(cas) cas.addEventListener("change", function(){ f.cas=cas.value; zmena(); });
+    k.querySelectorAll("[data-akce]").forEach(function(b){ b.onclick=function(){
+      if(b.dataset.akce==="vynechat") f.stav="vynechat";
+      else f.stav=f.text?"ceka":"chybi";
+      zmena(); vykresli();
+    }; });
+  });
+}
+
+function vykresliNovou(){
+  var el=$("sekce-nova");
+  var html='<div class="karta"><div class="nova-form">';
+  if(novaVyber){
+    var p=osoba(novaVyber);
+    html+='<div class="vybrany"><b>'+esc(p.jmeno)+'</b><span class="osoba-meta">'+esc(p.tel||"bez čísla")+'</span><button data-akce="zrusit" aria-label="Zrušit výběr">&times;</button></div>';
+  } else {
+    html+='<input type="search" id="novaHledani" placeholder="Komu? Začni psát jméno..." value="'+esc(novaHledej)+'">';
+    if(novaHledej){
+      var shody=D.lide.filter(function(p){ return fold(p.jmeno).indexOf(fold(novaHledej))>=0; }).slice(0,8);
+      html+='<div class="osoba-seznam">'+ (shody.length? shody.map(function(p){
+        return '<div class="osoba-rada" data-vyber="'+esc(p.id)+'"><div class="osoba-info"><div class="osoba-jmeno">'+esc(p.jmeno)+'</div>'+
+        '<div class="osoba-meta">'+esc([p.kdo,p.svet].filter(Boolean).join(" · "))+'</div></div>'+
+        '<div class="osoba-datumy">'+(p.tel?"📱":"bez čísla")+'</div></div>';
+      }).join(""):'<div class="osoba-rada">Nikdo takový v seznamu není.</div>')+'</div>';
+    }
+  }
+  var dnes=new Date(), moznosti=[];
+  for(var i=0;i<3;i++){ var d=new Date(dnes); d.setDate(d.getDate()+i);
+    var iso=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+    moznosti.push([i===0?"Dnes":i===1?"Zítra":DNY[d.getDay()]+" "+d.getDate()+".", iso]); }
+  if(!novaDatum) novaDatum=moznosti[0][1];
+  html+='<div class="radek"><label>Kdy</label><div class="datum-chipy">'+
+    moznosti.map(function(m){ return '<button data-datum="'+m[1]+'" class="'+(novaDatum===m[1]?"aktivni":"")+'">'+m[0]+'</button>'; }).join("")+
+    '<input type="date" id="novaDatumVlastni" value="'+esc(novaDatum)+'" min="'+dnesStr()+'"></div></div>';
+  html+='<div class="radek"><label>V kolik</label><input type="time" id="novaCas" value="'+vychoziCas()+'"></div>';
+  html+='<textarea id="novaText" placeholder="Text zprávy..."></textarea>';
+  html+='<div class="k-akce"><button class="tl-akcent" id="novaPridat">Přidat do fronty</button></div>';
+  html+='</div></div>';
+  el.innerHTML=html;
+
+  var hl=$("novaHledani");
+  if(hl){ hl.oninput=function(){ novaHledej=hl.value; vykresliNovou(); var n=$("novaHledani"); n.focus(); n.setSelectionRange(n.value.length,n.value.length); }; }
+  el.querySelectorAll("[data-vyber]").forEach(function(r){ r.onclick=function(){ novaVyber=r.dataset.vyber; vykresliNovou(); }; });
+  var zr=el.querySelector("[data-akce=zrusit]"); if(zr) zr.onclick=function(){ novaVyber=null; novaHledej=""; vykresliNovou(); };
+  el.querySelectorAll("[data-datum]").forEach(function(b){ b.onclick=function(){ novaDatum=b.dataset.datum; $("novaDatumVlastni").value=novaDatum; vykresliNovou(); }; });
+  $("novaDatumVlastni").onchange=function(){ novaDatum=this.value; vykresliNovou(); };
+  $("novaPridat").onclick=function(){
+    var text=$("novaText").value.trim();
+    if(!novaVyber){ toast("Vyber, komu se má psát"); return; }
+    if(!text){ toast("Chybí text zprávy"); return; }
+    D.fronta.push({ id:"zprava-"+novaVyber+"-"+novaDatum+"-"+Math.floor(Math.random()*1e6),
+      osobaId:novaVyber, typ:"zprava", datum:novaDatum, cas:$("novaCas").value||vychoziCas(), text:text, stav:"ceka" });
+    D.fronta.sort(function(a,b){ return (a.datum+casPro(a)).localeCompare(b.datum+casPro(b)); });
+    novaVyber=null; novaHledej=""; novaDatum=null;
+    zmena(); tab="fronta"; vykresli(); toast("Ve frontě");
+  };
+}
+
+function vykresliLidi(){
+  var el=$("sekce-lidi");
+  var bezCisla=D.lide.filter(function(p){ return (p.pratNarozeniny||p.pratSvatek)&&!p.tel; }).length;
+  var html='<div class="hledani"><input type="search" id="lidiHledani" placeholder="Hledat mezi '+D.lide.length+' lidmi..." value="'+esc(lidiHledej)+'"></div>';
+  html+='<div class="filtr-chipy">'+
+    [["vse","Všichni"],["bez-cisla","Bez čísla ("+bezCisla+")"],["jadro","Jádro a blízcí"],["narozeniny","S narozeninami"]].map(function(f){
+      return '<button data-filtr="'+f[0]+'" class="'+(lidiFiltr===f[0]?"aktivni":"")+'">'+f[1]+'</button>'; }).join("")+'</div>';
+  var seznam=D.lide.filter(function(p){
+    if(lidiHledej&&fold(p.jmeno+" "+(p.kdo||"")).indexOf(fold(lidiHledej))<0) return false;
+    if(lidiFiltr==="bez-cisla") return (p.pratNarozeniny||p.pratSvatek)&&!p.tel;
+    if(lidiFiltr==="jadro") return p.blizkost==="Jádro"||p.blizkost==="Blízcí";
+    if(lidiFiltr==="narozeniny") return !!p.narozeniny;
+    return true;
+  });
+  html+='<div class="osoba-seznam">';
+  if(!seznam.length) html+='<div class="osoba-rada">Nikdo neodpovídá hledání.</div>';
+  seznam.slice(0,120).forEach(function(p){
+    var data=[];
+    if(p.narozeniny){ var n=p.narozeniny.split("-"); data.push("🎂 "+n[1]+". "+n[0]+"."); }
+    if(p.svatek&&p.pratSvatek){ var s=p.svatek.split("-"); data.push("🌼 "+s[1]+". "+s[0]+"."); }
+    html+='<div><div class="osoba-rada" data-osoba="'+esc(p.id)+'"><div class="osoba-info">'+
+      '<div class="osoba-jmeno">'+esc(p.jmeno)+(p.tel?"":' <span class="chip pozor">bez čísla</span>')+'</div>'+
+      '<div class="osoba-meta">'+esc([p.kdo,p.svet].filter(Boolean).join(" · ")||" ")+'</div></div>'+
+      '<div class="osoba-datumy">'+data.join("<br>")+'</div></div>';
+    if(lidiOtevreny===p.id){
+      html+='<div class="osoba-detail">'+
+        '<div class="radek"><label>Telefon</label><input type="tel" data-pole="tel" value="'+esc(p.tel)+'" placeholder="+420..."></div>'+
+        '<div class="radek"><label>Čas přání</label><input type="time" data-pole="cas" value="'+esc(p.cas||"")+'" placeholder="'+vychoziCas()+'"></div>'+
+        (p.narozeniny?'<label class="prepinac">Přát k narozeninám <input type="checkbox" data-pole="pratNarozeniny" '+(p.pratNarozeniny?"checked":"")+'></label>':"")+
+        (p.svatek?'<label class="prepinac">Přát k svátku <input type="checkbox" data-pole="pratSvatek" '+(p.pratSvatek?"checked":"")+'></label>':"")+
+        '<div class="radek"><label>Narozeniny</label><input type="text" data-pole="narozeniny" value="'+esc(p.narozeniny)+'" placeholder="měsíc-den, třeba 10-9"></div>'+
+      '</div>';
+    }
+    html+='</div>';
+  });
+  html+='</div>';
+  if(seznam.length>120) html+='<div class="paticka">Zobrazuju prvních 120, zbytek najdeš hledáním.</div>';
+  html+='<div class="karta" style="margin-top:14px"><div class="radek"><label>Výchozí čas</label><input type="time" id="nastavCas" value="'+vychoziCas()+'"></div></div>';
+  el.innerHTML=html;
+
+  var hl=$("lidiHledani");
+  hl.oninput=function(){ lidiHledej=hl.value; lidiOtevreny=null; vykresliLidi(); var n=$("lidiHledani"); n.focus(); n.setSelectionRange(n.value.length,n.value.length); };
+  el.querySelectorAll("[data-filtr]").forEach(function(b){ b.onclick=function(){ lidiFiltr=b.dataset.filtr; lidiOtevreny=null; vykresliLidi(); }; });
+  el.querySelectorAll("[data-osoba]").forEach(function(r){ r.onclick=function(){
+    lidiOtevreny=(lidiOtevreny===r.dataset.osoba)?null:r.dataset.osoba; vykresliLidi();
+  }; });
+  el.querySelectorAll(".osoba-detail [data-pole]").forEach(function(inp){
+    var p=osoba(lidiOtevreny); if(!p) return;
+    inp.addEventListener("change", function(){
+      var pole=inp.dataset.pole;
+      if(inp.type==="checkbox") p[pole]=inp.checked; else p[pole]=inp.value.trim();
+      if(pole==="narozeniny") p.pratNarozeniny=!!p.narozeniny&&p.pratNarozeniny!==false;
+      doplnFrontu(); zmena();
+    });
+  });
+  $("nastavCas").onchange=function(){ D.nastaveni.vychoziCas=this.value; zmena(); };
+}
+
+function vykresliPoslane(){
+  var el=$("sekce-poslane"), dnes=dnesStr();
+  var polozky=[];
+  (D.fronta||[]).forEach(function(f){
+    if(f.stav==="odeslano"||f.stav==="selhalo"||(f.datum<dnes&&f.stav!=="vynechat")) polozky.push(f);
+  });
+  (D.odeslane||[]).forEach(function(o){ polozky.push(o); });
+  var videne={}; polozky=polozky.filter(function(f){ if(videne[f.id]) return false; videne[f.id]=true; return true; });
+  polozky.sort(function(a,b){ return (b.odeslanoKdy||b.datum).localeCompare(a.odeslanoKdy||a.datum); });
+  if(!polozky.length){ el.innerHTML='<div class="prazdno"><div class="velke">📮</div>Zatím nic neodešlo.</div>'; return; }
+  var html="";
+  polozky.slice(0,80).forEach(function(f){
+    var p=osoba(f.osobaId); var jmeno=p?p.jmeno:(f.jmeno||"");
+    var chip= f.stav==="odeslano"?'<span class="chip ok">odesláno</span>':
+              f.stav==="selhalo"?'<span class="chip chyba">neodešlo</span>':
+              '<span class="chip pozor">propadlo</span>';
+    html+='<div class="karta"><div class="k-hlava"><div><div class="k-jmeno">'+esc(jmeno)+'</div>'+
+      '<div class="k-kdo">'+hezkyDatum(f.datum)+(f.odeslanoKdy?(" · "+new Date(f.odeslanoKdy).toLocaleTimeString("cs-CZ",{hour:"2-digit",minute:"2-digit"})):"")+'</div></div>'+
+      '<div class="chipy">'+chipTyp(f.typ)+chip+'</div></div>';
+    if(f.text) html+='<div class="k-telo"><div class="k-kdo">'+esc(f.text)+'</div></div>';
+    if(f.stav!=="odeslano"&&p&&p.tel&&f.text) html+='<div class="k-akce"><a class="tl-ok" href="'+esc(smsOdkaz(p.tel,f.text))+'">Poslat ručně</a></div>';
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
+/* ---------- start ---------- */
+document.querySelectorAll("#taby button").forEach(function(b){
+  b.onclick=function(){ tab=b.dataset.tab; vykresli(); window.scrollTo({top:0}); };
+});
+$("tlObnovit").onclick=function(){
+  if(spinave&&!confirm("Máš neuložené změny, načtením o ně přijdeš. Pokračovat?")) return;
+  nacti();
+};
+$("tlUlozit").onclick=uloz;
+window.addEventListener("beforeunload", function(e){ if(spinave){ e.preventDefault(); e.returnValue=""; } });
+document.addEventListener("keydown", function(e){ if((e.metaKey||e.ctrlKey)&&e.key==="s"){ e.preventDefault(); uloz(); } });
+nacti();
+})();
+</script>
