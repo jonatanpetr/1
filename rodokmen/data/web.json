@@ -1,0 +1,29 @@
+{
+ "nazev": "Rodokmen Petrových",
+ "popis": "Rodokmen rodu Petrových a Dvořákových",
+ "zapati": "Dohledáno v digitalizovaných matrikách státních oblastních archivů",
+ "kontakt": {
+  "jmeno": "Jonatan Petr",
+  "email": ""
+ },
+ "prihlaseni": {
+  "uvod": "Tenhle web je jen pro rodinu a příbuzné.",
+  "otazka": "",
+  "odpoved": ""
+ },
+ "uvod": {
+  "nadpis": "Odkud jsme se vzali",
+  "odstavce": [
+   "Rodokmen Petrových a Dvořákových. Začíná u mě a jde nazpět, generaci po generaci, přes vzpomínky rodiny až do starých matrik.",
+   "Zatím je tu jen základ. Každá babička, která si vzpomene na jméno svého dědy, posune strom o kus dál."
+  ],
+  "foto": "",
+  "foto_popis": ""
+ },
+ "pribeh": {
+  "menu": "",
+  "rod": 8,
+  "tlacitko": ""
+ },
+ "zajimavosti_na_uvodu": []
+}
